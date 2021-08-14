@@ -1,0 +1,9 @@
+git+https://github.com/Rapptz/discord.py
+datetime
+python-dateutil
+pandas
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+gspread
+oauth2client
