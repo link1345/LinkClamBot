@@ -1,26 +1,13 @@
 import discord
 from discord.ext import tasks
 
-from datetime import datetime, timedelta
-import urllib.parse
-import os
-import sys
-import importlib
-
 import functools 
 
 import config.BaseSetting # token 設定場所
+
+import base.Command as Command
+
 import base.DiscordSend as Sendtool
-
-
-#class test_task(tasks.Loop) :
-#	def __init__(self):
-#		#super().__init__('coro', 'seconds', 'hours', 'minutes', 'time', 'count', 'reconnect', and 'loop')
-#		self.seconds = 10
-	
-#	async def __call__(self , *args, **kwargs):
-#		print("test")
-
 
 class LinkClanBot :
 
@@ -32,13 +19,10 @@ class LinkClanBot :
 
 		self.client = discord.Client(intents=intents)
 
-
-		#self.test_task = tasks.Loop()
-		#self.test_task.seconds = 10
+		self.command = Command.DiscordCommand()
+		self.command.Commandimport()
 
 		self.EventSet()	
-
-		print( type(self) )
 
 
 	def run(self) :
@@ -46,14 +30,16 @@ class LinkClanBot :
 
 	def EventSet(self) :
 	
+		text = "test1"
+
 		@self.client.event
 		async def on_message(message: discord.Message):
-			#await message.channel.send("test")
-			await Sendtool.Send(message, "test")
+			await self.command.on_message(self.client, message)
 			pass
 
 		@self.client.event
 		async def on_ready():
+			await self.command.on_ready(self.client)
 			pass
 		
 		@self.client.event
@@ -72,11 +58,14 @@ class LinkClanBot :
 		async def on_voice_state_update(member, before, after):
 			pass
 
-		async def test(text: str):
-			print("test " + text)
+		@self.client.event
+		async def on_interaction(interaction: discord.Interaction ):
+			await self.command.on_interaction(self.client, interaction)
+			pass
 
-		test_task = (tasks.loop(seconds=5))(test)
-		test_task.start("hello")
+		#async def test(text: str):
+		#	print("test " + text)
 
-		#self.test_task.__call__ = test
-		#self.test_task.start()
+		#test_task = (tasks.loop(seconds=5))(test)
+		#test_task.start("hello")
+		

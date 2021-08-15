@@ -11,17 +11,18 @@ import sys
 
 import base.ColorPrint as color
 
-async def easy_textsend( channel: discord.TextChannel, message: str , filename=None ) :
+async def easy_textsend( channel: discord.TextChannel, message: str , filename=None , view=None ) :
 	printtext = datetime.now().strftime("%Y/%m/%d %H:%M:%S")  + " : " + message 
 	print(printtext)
 
 	# チャンネルにアクセスできない場合は、スルーします。
 	if channel is not None :
 		try :
-			if filename is None :
-				await channel.send(message)
-			else :
-				await channel.send(message,file=discord.File(filename))
+			filedata = None
+			if filename is not None :
+				filedata = discord.File(filename)
+			
+			await channel.send(message, file=filedata , view=view )
 		except discord.HTTPException as log :
 			color.error_print("ERROR : メッセージの送信に失敗しました。")
 			color.error_print("ERRORCORD : {0}".format(log) )

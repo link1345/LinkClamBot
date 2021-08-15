@@ -1,7 +1,5 @@
 import discord
 
-from functools import singledispatch
-
 import base.EasySend as ESend
 
 def text_check(text) :
@@ -13,8 +11,14 @@ def text_check(text) :
 	text = text.replace(">","\>")
 	return text
 
+def bot_check(user: discord.Member):
+	if user.bot :
+		return True
+	else :
+		return False
 
-async def Send_channel(channelID: int, member: discord.Member , message: str, filename=None):
+		
+async def Send_ChannelID(client: discord.Client, channelID: int, message: str, filename=None, view=None):
 	"""
 	指定チャンネルIDにテキストメッセージを出す。
 
@@ -25,20 +29,16 @@ async def Send_channel(channelID: int, member: discord.Member , message: str, fi
 		None
 	"""
 
-	if member.bot :
-		return
-
-	channel = self.client.get_channel( channelID )
+	channel = client.get_channel( channelID )
 	if channel is None :
 		return False
 	else :
-		ESend.easy_textsend( channel, message , filename )
+		await ESend.easy_textsend( channel, message , filename , view)
 		return True
 
 # ---------------------------------------------
 
-@singledispatch
-async def Send(Data: discord.Message, message: str, filename=None):
+async def Send_Member(Data: discord.Message, message: str, filename=None, view=None):
 	"""
 	discord.Messageクラスを貰った時に、そのチャンネルにメッセージを返す。
 
@@ -49,14 +49,13 @@ async def Send(Data: discord.Message, message: str, filename=None):
 		None
 	"""
 	# Botなら、終了
-	if Data.author.bot :
-		return False
+	if bot_check(Data.author) :
+		return
 	
-	await ESend.easy_textsend( Data.channel, message , filename )
+	await ESend.easy_textsend( Data.channel, message , filename , view)
 	return True
 
-@Send.register
-async def _(Data: discord.User, message: str, filename=None):
+async def Send_User(Data: discord.User, message: str, filename=None, view=None):
 	"""
 	discord.Messageクラスを貰った時に、そのチャンネルにメッセージを返す。
 
@@ -67,9 +66,8 @@ async def _(Data: discord.User, message: str, filename=None):
 		None
 	"""
 	# Botなら、終了
-	if Data.author.bot :
-		print("test out!")
-		return False
+	if bot_check(Data.author) :
+		return
 	
-	ESend.easy_textsend( Data.channel, message , filename )
+	ESend.easy_textsend( Data.channel, message , filename , view)
 	return True

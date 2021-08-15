@@ -24,7 +24,7 @@ def error_print(text):
 	
 	"""
 	
-	text = red_color + text + normal_color
+	text = red_color + "[ERROR] " + text + normal_color
 	print("{0}".format(text) , file=sys.stderr)
 			
 def success_print(text):
@@ -39,7 +39,7 @@ def success_print(text):
 	
 	"""
 	
-	text = blue_color + text + normal_color
+	text = blue_color +  "[success] " + text + normal_color
 	print("{0}".format(text) )
 	
 def warning_print(text):
@@ -54,5 +54,5 @@ def warning_print(text):
 	
 	"""
 	
-	text = yellow_color + text + normal_color
+	text = yellow_color +"[WARNIG] " +  text + normal_color
 	print("{0}".format(text) )
