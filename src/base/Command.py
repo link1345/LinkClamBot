@@ -33,12 +33,12 @@ class DiscordCommand :
 			self.C_list = CommandSet.CommandList
 
 			# 通常モジュール取得
-			self.Commandimport()
+			self.Commandimport(mode="reload")
 			#for key in self.C_list.keys() :
 			#	importlib.reload(self.C_list[key]["module"])
 			#	self.C_list[key]["object"] = self.C_list[key]["module"].command()
 				
-			# タスクイベントリロード			
+			# タスクイベント リロード			
 			self.setTask(client)
 
 
@@ -50,10 +50,13 @@ class DiscordCommand :
 			return False
 
 
-	def Commandimport(self):
-		for key in self.C_list.keys() :
-			#print( key )
+	def Commandimport(self, mode="defule"):
+		for key in self.C_list.keys() :	
 			self.C_list[key]["module"] = importlib.import_module( self.C_list[key]["PythonFile"])
+
+			if mode == "reload" :
+				importlib.reload( self.C_list[key]["module"] )
+
 			self.C_list[key]["object"] = self.C_list[key]["module"].command()
 		#print ( self.C_list )
 

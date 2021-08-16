@@ -24,7 +24,7 @@ def error_print(text):
 	
 	"""
 	
-	text = red_color + "[ERROR] " + text + normal_color
+	text = red_color + "[ERROR]  " + text + normal_color
 	print("{0}".format(text) , file=sys.stderr)
 			
 def success_print(text):

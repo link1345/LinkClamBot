@@ -11,6 +11,14 @@ class test_button_Button(discord.ui.Button['test_button']):
 
 		self.clientData = clientData
 		self.client = client
+
+		
+		if self.label == "YES" :
+			self.style = discord.ButtonStyle.red
+		else :
+			self.style = discord.ButtonStyle.blurple
+
+
 		
 	async def callback(self, interaction: discord.Interaction) :
 
