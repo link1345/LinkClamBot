@@ -1,4 +1,5 @@
 import discord
+from discord.ext import tasks
 
 import os
 
@@ -20,13 +21,27 @@ class DiscordCommand :
 		#self.root_command_folder = "./opt/command"
 		self.C_list = CommandSet.CommandList
 	
-	async def reload(self) :
+
+	async def reload(self, client: discord.Client) :
 		CPrint.warning_print(" ----------- Module Reload ----------- ")
 		try :
-			for key in self.C_list.keys() :
-				importlib.reload(self.C_list[key]["module"])
-				self.C_list[key]["object"] = self.C_list[key]["module"].command()
-			
+			# まずはタスク全消し。
+			self.removeTask()
+
+			# 設定リロード
+			importlib.reload(CommandSet)
+			self.C_list = CommandSet.CommandList
+
+			# 通常モジュール取得
+			self.Commandimport()
+			#for key in self.C_list.keys() :
+			#	importlib.reload(self.C_list[key]["module"])
+			#	self.C_list[key]["object"] = self.C_list[key]["module"].command()
+				
+			# タスクイベントリロード			
+			self.setTask(client)
+
+
 			CPrint.success_print(" ------- Success Module Reload ------- ")
 			return True
 		except :
@@ -35,13 +50,52 @@ class DiscordCommand :
 			return False
 
 
-
 	def Commandimport(self):
 		for key in self.C_list.keys() :
 			#print( key )
 			self.C_list[key]["module"] = importlib.import_module( self.C_list[key]["PythonFile"])
 			self.C_list[key]["object"] = self.C_list[key]["module"].command()
 		#print ( self.C_list )
+
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+
+	def setTask(self, client: discord.Client):
+		for key in self.C_list :
+			taskData = self.C_list[key].get("on_task")
+			if taskData is not None :
+				for taskkey in taskData :
+					# タスク関数を取得
+					func = getattr( self.C_list[key]["object"] , taskkey )
+					self.C_list[key]["on_task"][taskkey]["func"] = func
+
+					# hours
+					timelist = ["hours" , "minutes" , "seconds"]
+					timedata = []
+					for timeitem in timelist :
+						timedata.append( self.C_list[key]["on_task"][taskkey].get(timeitem) )
+					
+					# 実行内容
+					self.C_list[key]["on_task"][taskkey]["task"] = ( tasks.loop(hours=timedata[0] , minutes=timedata[1],seconds=timedata[2] ))( self.C_list[key]["on_task"][taskkey]["func"] )
+					self.C_list[key]["on_task"][taskkey]["task"].start( config=self.C_list[key], client=client )
+
+		pass
+	
+
+	def removeTask(self):
+		for key in self.C_list :
+			taskData = self.C_list[key].get("on_task")
+			if taskData is not None :
+				for taskkey in taskData :
+
+					# ストップ!
+					if self.C_list[key]["on_task"][taskkey].get("task") is not None :
+						self.C_list[key]["on_task"][taskkey]["task"].stop()
+
+		pass
+
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 	async def on_message(self, client: discord.Client, message: discord.Message):
 		
@@ -103,7 +157,7 @@ class DiscordCommand :
 			c_role_flag = False
 			for item_role in c_role :
 				for user_role in message.author.roles :
-					if item_role == user_role.name :
+					if item_role == str(user_role.id) :
 						c_role_flag = True
 						run_Flag.append("role")
 						break
@@ -125,9 +179,12 @@ class DiscordCommand :
 				# イベント先がない場合は、スルーする。
 				pass
 	
+		# Bot起動後にタスク読み込み
+		self.setTask(client)
+
 		for key in self.C_list :
 			await run(key , client=client)
-		
+
 		pass
 	
 
@@ -140,7 +197,7 @@ class DiscordCommand :
 				if key == "RELOAD" :
 					if self.C_list[key]["object"].ReloadFlag :
 						self.C_list[key]["object"].ReloadFlag = False
-						await self.reload()
+						await self.reload(client)
 
 			except AttributeError:
 				# イベント先がない場合は、スルーする。
@@ -148,3 +205,19 @@ class DiscordCommand :
 
 		for key in self.C_list :
 			await run(key , client=client,  interaction=interaction)
+
+
+	async def on_member_update(self, client: discord.Client, before: discord.Member, after: discord.Member):
+		pass
+
+
+	async def on_member_remove(self, client: discord.Client, member: discord.Member ):
+		pass
+
+
+	async def on_user_update(self, client: discord.Client, before: discord.User, after: discord.User):
+		pass
+
+
+	async def on_voice_state_update(self, client: discord.Client, member: discord.Member, before: discord.VoiceState , after: discord.VoiceState):
+		pass

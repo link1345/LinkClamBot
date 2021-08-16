@@ -1,6 +1,7 @@
 import discord
 
 import base.EasySend as ESend
+import base.ColorPrint as CPrint
 
 def text_check(text) :
 	text = text.replace("_","\_")
@@ -31,6 +32,7 @@ async def Send_ChannelID(client: discord.Client, channelID: int, message: str, f
 
 	channel = client.get_channel( channelID )
 	if channel is None :
+		CPrint.error_print("チャンネルが存在ぜず、送信できませんでした")
 		return False
 	else :
 		await ESend.easy_textsend( channel, message , filename , view)
