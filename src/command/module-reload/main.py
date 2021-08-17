@@ -67,7 +67,7 @@ class command(base.command_base) :
 		self.eventButton : test_button
 
 	async def on_message(self, config, client: discord.Client, message: discord.Message) :			
-		
+		print("test")
 		self.eventButton = test_button(["YES","NO"], client=client ,clientData=self )
 		await Sendtool.Send_Member(Data=message, message="本当にモジュールをリロードしますか？", filename=None,view=self.eventButton)
 		

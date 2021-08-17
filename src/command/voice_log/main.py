@@ -155,7 +155,7 @@ class command(base.command_base)  :
 		if channellist is None :
 			return 
 
-		await Sendtool.Send_ChannelID(client=client, channelID=channellist , message="TASKCheck! - voice_outputlog")
+		#await Sendtool.Send_ChannelID(client=client, channelID=channellist , message="TASKCheck! - voice_outputlog")
 
 
 		## --------

@@ -113,12 +113,6 @@ class DiscordCommand :
 		async def run( key: str, client: discord.Client, message: discord.Message ):
 			try :
 				await self.C_list[key]["object"].on_message(config=self.C_list[key], client=client, message=message)
-
-				#if key == "RELOAD" :
-				#	if self.C_list[key]["object"].ReloadFlag :
-				#		self.C_list[key]["object"].ReloadFlag = False
-				#		await self.reload()
-
 			except AttributeError:
 				# イベント先がない場合は、スルーする。
 				pass
@@ -140,7 +134,7 @@ class DiscordCommand :
 			# 以降[Bot判定あり]
 
 			run_Flag = [] # Max=3
-			
+
 			# 命令チェック
 			c_text = self.C_list[key]["onMessage"].get("CommandText")
 			if c_text is None :
@@ -151,35 +145,27 @@ class DiscordCommand :
 					if check_cotent ==  message.content :
 						run_Flag.append("Text")
 						break
-				
+			
 			# ChannelIDチェック
 			c_channel = self.C_list[key]["onMessage"].get("channelID")
 			if c_channel is None :
-				run_Flag.append("Channel")
-			else : 
-				for item_channel in c_channel :
-					if str(message.channel.id) == item_channel :
-						run_Flag.append("Channel")
-						break
+				run_Flag.append("Channel") ## ここ確認
+			else :
+				if message.channel.id in c_channel : 
+					run_Flag.append("Channel")
 
 			# ロールチェック
 			c_role = self.C_list[key]["onMessage"].get("role")
 			if c_role is None :
 				run_Flag.append("role")
 			else :
-				c_role_flag = False
-				for item_role in c_role :
-					for user_role in message.author.roles :
-						if item_role == str(user_role.id) :
-							c_role_flag = True
-							run_Flag.append("role")
-							break
-					
-					if c_role_flag == True :
+				for item_role in message.author.roles:
+					if item_role.id in c_role :
+						run_Flag.append("role")
 						break
 
 			# ALLチェック完了 run
-			#print("flag : " +  str(run_Flag)  )
+			#print("flag : " +  str(run_Flag) + "  content:" + message.content )
 			if len(run_Flag) == 3 :
 				await run(key, client, message)
 
