@@ -9,9 +9,14 @@ import base.Command as Command
 
 import base.DiscordSend as Sendtool
 
+import os
+
 class LinkClanBot :
 
 	def __init__(self):
+
+
+		os.chdir("/root/opt")
 
 		intents = discord.Intents.default()
 		intents.members = True
@@ -22,8 +27,7 @@ class LinkClanBot :
 		self.command = Command.DiscordCommand()
 		self.command.Commandimport()
 
-		self.EventSet()	
-
+		self.EventSet()
 
 	def run(self) :
 		self.client.run(config.BaseSetting.BotToken)
@@ -56,6 +60,7 @@ class LinkClanBot :
 
 		@self.client.event
 		async def on_voice_state_update(member, before, after):
+			await self.command.on_voice_state_update(self.client, member, before, after)
 			pass
 
 		@self.client.event

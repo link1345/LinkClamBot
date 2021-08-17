@@ -19,7 +19,7 @@ def bot_check(user: discord.Member):
 		return False
 
 		
-async def Send_ChannelID(client: discord.Client, channelID: int, message: str, filename=None, view=None):
+async def Send_ChannelID(client: discord.Client, channelID: list[int], message: str, filename=None, view=None):
 	"""
 	指定チャンネルIDにテキストメッセージを出す。
 
@@ -30,13 +30,14 @@ async def Send_ChannelID(client: discord.Client, channelID: int, message: str, f
 		None
 	"""
 
-	channel = client.get_channel( channelID )
-	if channel is None :
-		CPrint.error_print("チャンネルが存在ぜず、送信できませんでした")
-		return False
-	else :
-		await ESend.easy_textsend( channel, message , filename , view)
-		return True
+	for ID in channelID : 
+		channel = client.get_channel( ID )
+		if channel is None :
+			CPrint.error_print("チャンネルが存在ぜず、送信できませんでした")
+			return False
+		else :
+			await ESend.easy_textsend( channel, message , filename , view)
+			return True
 
 # ---------------------------------------------
 

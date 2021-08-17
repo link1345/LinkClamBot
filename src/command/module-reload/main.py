@@ -24,9 +24,9 @@ class test_button_Button(discord.ui.Button['test_button']):
 
 		if self.label == "YES" :
 			self.clientData.ReloadFlag = True
-			await Sendtool.Send_ChannelID(client=self.client, channelID=interaction.channel_id, message="モジュールリロードします。")
+			await Sendtool.Send_ChannelID(client=self.client, channelID=[interaction.channel_id], message="モジュールリロードします。")
 		else :
-			await Sendtool.Send_ChannelID(client=self.client, channelID=interaction.channel_id, message="モジュールリロードしませんでした")
+			await Sendtool.Send_ChannelID(client=self.client, channelID=[interaction.channel_id], message="モジュールリロードしませんでした")
 
 		# ------------
 

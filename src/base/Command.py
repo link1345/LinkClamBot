@@ -32,21 +32,29 @@ class DiscordCommand :
 			importlib.reload(CommandSet)
 			self.C_list = CommandSet.CommandList
 
+			# 追加モジュールリロード
+			for key in self.C_list.keys() :	
+				if  self.C_list[key].get("Add_Module") is None :
+					continue
+				
+				for module in self.C_list[key]["Add_Module"] :
+					importlib.reload( importlib.import_module( module ) )
+
+
 			# 通常モジュール取得
 			self.Commandimport(mode="reload")
-			#for key in self.C_list.keys() :
-			#	importlib.reload(self.C_list[key]["module"])
-			#	self.C_list[key]["object"] = self.C_list[key]["module"].command()
-				
-			# タスクイベント リロード			
+			
+			# タスクイベント リロード
 			self.setTask(client)
 
 
 			CPrint.success_print(" ------- Success Module Reload ------- ")
 			return True
 		except :
-			
 			CPrint.error_print(  " -------- Error Module Reload -------- ")
+			
+			import traceback
+			traceback.print_exc()
 			return False
 
 
@@ -117,7 +125,7 @@ class DiscordCommand :
 
 		for key in self.C_list :
 			# メッセージ設定が無ければ、そのまま通す. [bot判定なし]
-			if self.C_list[key].get("onMessage") == None :
+			if self.C_list[key].get("onMessage") is None :
 				await run(key, client, message)
 				continue
 			
@@ -125,7 +133,7 @@ class DiscordCommand :
 				#print("BOT!")
 				continue
 
-			if self.C_list[key]["object"].talk == True :
+			if self.C_list[key]["object"].talk is True :
 				await run(key, client, message)
 				continue
 
@@ -135,38 +143,40 @@ class DiscordCommand :
 			
 			# 命令チェック
 			c_text = self.C_list[key]["onMessage"].get("CommandText")
-			if c_text == None :
+			if c_text is None :
 				run_Flag.append("Text")
-			for item_text in c_text :
-				check_cotent = client.user.display_name + item_text
-				if check_cotent ==  message.content :
-					run_Flag.append("Text")
-					break
-			
+			else :				
+				for item_text in c_text :
+					check_cotent = client.user.display_name + item_text
+					if check_cotent ==  message.content :
+						run_Flag.append("Text")
+						break
+				
 			# ChannelIDチェック
 			c_channel = self.C_list[key]["onMessage"].get("channelID")
-			if c_channel == None :
+			if c_channel is None :
 				run_Flag.append("Channel")
-			for item_channel in c_channel :
-				if str(message.channel.id) == item_channel :
-					run_Flag.append("Channel")
-					break
+			else : 
+				for item_channel in c_channel :
+					if str(message.channel.id) == item_channel :
+						run_Flag.append("Channel")
+						break
 
 			# ロールチェック
 			c_role = self.C_list[key]["onMessage"].get("role")
-			if c_role == None :
+			if c_role is None :
 				run_Flag.append("role")
-			
-			c_role_flag = False
-			for item_role in c_role :
-				for user_role in message.author.roles :
-					if item_role == str(user_role.id) :
-						c_role_flag = True
-						run_Flag.append("role")
+			else :
+				c_role_flag = False
+				for item_role in c_role :
+					for user_role in message.author.roles :
+						if item_role == str(user_role.id) :
+							c_role_flag = True
+							run_Flag.append("role")
+							break
+					
+					if c_role_flag == True :
 						break
-				
-				if c_role_flag == True :
-					break
 
 			# ALLチェック完了 run
 			#print("flag : " +  str(run_Flag)  )
@@ -223,4 +233,13 @@ class DiscordCommand :
 
 
 	async def on_voice_state_update(self, client: discord.Client, member: discord.Member, before: discord.VoiceState , after: discord.VoiceState):
+		async def run( key: str, client: discord.Client , member: discord.Member, before: discord.VoiceState , after: discord.VoiceState):
+			try:
+				await self.C_list[key]["object"].on_voice_state_update(config=self.C_list[key], client=client, member=member, before=before , after=after)
+			except AttributeError:
+				# イベント先がない場合は、スルーする。
+				pass
+	
+		for key in self.C_list :
+			await run(key , client=client, member=member, before=before , after=after)
 		pass
