@@ -178,11 +178,15 @@ class command(base.command_base)  :
 			filetime = today - relativedelta(months=1)
 			m_month = datetime.strftime(filetime,'%m')
 			m_year = datetime.strftime(filetime,'%Y')
+			month_filename = '{0}{1}'.format(m_year, m_month)
+			mv_filename = CSetting.baseLogFolder + CSetting.JSONPATH_row + month_filename + ".json"
 				
 			if sendfile is None :
 				text = "【一か月定期連絡】"+ m_year + "年"+ m_month +"月の音声チャンネルログインはありませんでした"
 				await Sendtool.Send_ChannelID(client=client, channelID=CSetting.OneMonthOutput_ChannelID, message=text, filename=None)
 			else :
+				text = "【一か月定期連絡】"+ m_year + "年"+ m_month +"月の音声チャンネルログイン生データ"
+				await Sendtool.Send_ChannelID(client=client, channelID=CSetting.OneMonthOutput_ChannelID, message=text, filename=mv_filename)
 				text = "【一か月定期連絡】"+ m_year + "年"+ m_month +"月の音声チャンネルログイン加工データ"
 				await Sendtool.Send_ChannelID(client=client, channelID=CSetting.OneMonthOutput_ChannelID, message=text, filename=sendfile)
 			pass
