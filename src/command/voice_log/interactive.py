@@ -208,6 +208,30 @@ class test_button_Button(discord.ui.Button['test_button']):
 				text = "過去の音声チャンネルログインデータ(加工済み)です"
 				await interaction.message.delete()
 				await Sendtool.Send_ChannelID(client=self.client, channelID=[interaction.message.channel.id], message=text, filename=send_fileName)
+
+				# -------
+
+				#waring_timeData = timeData.drop(columns=['name'])
+				waring_timeData = timeData
+
+				for user in waring_timeData.index.values :
+					waringNum = 0
+					for value in waring_timeData.columns.values :
+						if value == 'name' :
+							continue
+						if waring_timeData.loc[user, value] >= CSetting.WaringTime :
+							break
+						waringNum += 1
+					if not waringNum > CSetting.WaringMonths :
+						waring_timeData.drop(index=[user])
+
+				waring_timeData.to_csv( send_fileName )
+
+				if len(waring_timeData.index.values) != 0 :
+					text = "イエローカード判定が当てはまるメンバーのデータです"
+					await Sendtool.Send_ChannelID(client=self.client, channelID=[interaction.message.channel.id], message=text, filename=send_fileName)
+
+
 			else :
 				text = "過去ログの音声チャンネルログイン加工済みデータを作成できませんでした"
 				await interaction.message.delete()
@@ -257,7 +281,7 @@ class command(base.command_base)  :
 		self.fileNameList = []
 
 	async def on_message(self, config, client: discord.Client, message: discord.Message) :
-		print("test")
+		#print("test")
 
 		self.eventButton = test_button(["過去ログ","現行ログ"], client=client ,clientData=self , config=config )
 		await Sendtool.Send_Member(Data=message, message="どちらのログが欲しいですか？", filename=None,view=self.eventButton)

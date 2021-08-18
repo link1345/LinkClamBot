@@ -37,6 +37,8 @@ async def makeOldTimeList( client: discord.Client, MonthFileList:list[str] , Ind
 	for fileName in MonthFileList :
 		df = await makeTimeList( client, Datafile_path=fileName , RoleList=RoleList)
 		
+		#print( "test1" )
+		pprint( df )
 		if df is None :
 			break
 
@@ -46,10 +48,11 @@ async def makeOldTimeList( client: discord.Client, MonthFileList:list[str] , Ind
 		if MonthFileList.index(fileName) == 0 :
 			all_df = df
 		else :
-			all_df = pd.merge(all_df, df)
+			df = df.drop(columns=['name'])
+			all_df = pd.merge(all_df, df , left_index=True, right_index=True)
 			#df.loc[:,[labelname]]
 
-	pprint(all_df)
+	#pprint(all_df)
 	return all_df
 
 async def UserRoleMember( client: discord.Client, RoleList: list[int] ) :
