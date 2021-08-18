@@ -1,13 +1,56 @@
 import discord
-
+import os
 import json
 
 import datetime
 import pandas as pd
+from dateutil.relativedelta import relativedelta
+from pprint import pprint
 
 import base.ColorPrint as CPrint
 
-from pprint import pprint
+import command.voice_log.Config_Main as CSetting
+
+def most_old_Month() :
+
+	old_month =	1
+	labels = []
+	fileNameList = []
+	while True :
+		filetime = datetime.datetime.today() - relativedelta(months=old_month)
+		m_month = datetime.datetime.strftime(filetime,'%m')
+		m_year = datetime.datetime.strftime(filetime,'%Y')
+		filename = CSetting.baseLogFolder + CSetting.JSONPATH_row + m_year + m_month + ".json"
+		if not os.path.exists( filename ) :
+			old_month -= 1 # 調査用に+1してあるので、実際の値は、これにold_monthに-1したものとなる。
+			break
+		
+		labels.append( m_year + "/" + m_month )
+		fileNameList.append( filename )
+
+		old_month += 1
+
+	return old_month , labels , fileNameList
+
+async def makeOldTimeList( client: discord.Client, MonthFileList:list[str] , IndexLabel:list[str], RoleList: list[int] = CSetting.OneMonthOutput_RoleID ):
+	all_df = None
+	for fileName in MonthFileList :
+		df = await makeTimeList( client, Datafile_path=fileName , RoleList=RoleList)
+		
+		if df is None :
+			break
+
+		labelname = IndexLabel[MonthFileList.index(fileName)]
+		df = df.rename(columns={'time': labelname })
+
+		if MonthFileList.index(fileName) == 0 :
+			all_df = df
+		else :
+			all_df = pd.merge(all_df, df)
+			#df.loc[:,[labelname]]
+
+	pprint(all_df)
+	return all_df
 
 async def UserRoleMember( client: discord.Client, RoleList: list[int] ) :
 	"""
@@ -33,13 +76,13 @@ async def UserRoleMember( client: discord.Client, RoleList: list[int] ) :
 
 		# ロール制限がなければ、該当ロール部を取ってくる
 		for role_item in guild_item.roles :
-			if str(role_item.id) in RoleList :
+			if role_item.id in RoleList :
 				data += role_item.members
 	
 	return data
 
 
-async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: list[int] , mode="NAME"):
+async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: list[int]):
 	"""
 	[VC] 生のログデータを計算して、表にして返す。
  
@@ -64,7 +107,7 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 
 	members_IDlist , members_Namelist = getID(members=members)
 	
-	if members_IDlist is None or members_IDlist == {} :
+	if members_IDlist is None or members_IDlist == [] :
 		return None
 
 	# JSON取得
@@ -74,6 +117,8 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 			orig_TimeData = json.load(f)
 	except :
 		CPrint.error_print("JSONではありません")
+		import traceback
+		traceback.print_exc()
 		return None
 	
 	if orig_TimeData is None :
@@ -95,8 +140,12 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 
 	# 計算
 	for item in orig_TimeData :
+		try :
+			indexNum = members_IDlist.index(item["member.id"])
+		except ValueError as error :
+			# 現在の鯖に、存在しない人は処理しない。
+			continue
 
-		indexNum = members_IDlist.index(item["member.id"])
 		if item["Flag"] == "entry" :
 			 df_dict["start"][indexNum] = item["time"]
 		if item["Flag"] == "exit" :
@@ -115,7 +164,7 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 
 
 			time : float = (b_time - a_time).total_seconds()
-			print( "time : " + str(time) )
+			#print( "time : " + str(time) )
 			if time < 0.0 :
 				df_dict["time"][indexNum] += 0.0
 			else :

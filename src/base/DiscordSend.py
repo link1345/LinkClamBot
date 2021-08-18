@@ -74,3 +74,18 @@ async def Send_User(Data: discord.User, message: str, filename=None, view=None):
 	
 	ESend.easy_textsend( Data.channel, message , filename , view)
 	return True
+
+# ---------------------------------------------
+
+async def SendEdit_Interaction(interaction: discord.Interaction, message: str = None, view=None):
+
+	if message is None :
+		await interaction.message.delete()
+
+	fileData : list[str] = []
+	for name in filename :
+		fileData.append( discord.File(name) )
+	if len(filename) or filename is None :
+		fileData = None
+
+	await interaction.message.edit(content=message, files=fileData, view=view)
