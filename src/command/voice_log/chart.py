@@ -50,6 +50,7 @@ async def makeOldTimeList( client: discord.Client, MonthFileList:list[str] , Ind
 		else :
 			df = df.drop(columns=['name'])
 			all_df = pd.merge(all_df, df , left_index=True, right_index=True)
+			#all_df = pd.merge(all_df, df , left_index=True)
 			#df.loc[:,[labelname]]
 
 	#pprint(all_df)

@@ -48,14 +48,22 @@ class LinkClanBot :
 		
 		@self.client.event
 		async def on_member_remove(member):
+			await self.command.on_member_remove(self.client, member)
 			pass
 		
 		@self.client.event
 		async def on_member_update(before, after):
+			await self.command.on_member_update(self.client, before, after)
 			pass
 		
 		@self.client.event
 		async def on_user_update(before, after):
+			await self.command.on_user_update(self.client, before, after)
+			pass
+
+		@self.client.event
+		async def on_member_join(member):
+			await self.command.on_member_join(self.client, member)
 			pass
 
 		@self.client.event

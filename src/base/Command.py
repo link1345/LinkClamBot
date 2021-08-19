@@ -68,6 +68,45 @@ class DiscordCommand :
 			self.C_list[key]["object"] = self.C_list[key]["module"].command()
 		#print ( self.C_list )
 
+
+	async def roleCheck( self, role_list: list[int] , member: discord.Member ):
+
+		if role_list is None or role_list == [] :
+			return True
+
+		user_role_id = []
+		for user_role in member.roles :
+			user_role_id.append( user_role.id )
+			
+		for roleitem in role_list :
+			if roleitem in user_role_id : 
+				return True
+		return False
+
+		
+	async def roleCheck_user( self, client:discord.Client, role_list: list[int] , user: discord.User ):
+
+		if role_list is None or role_list == [] :
+			return True
+
+		user_role_id = []
+		for guild in client.guilds :
+			await guild.chunk()
+			member = guild.get_member(user.id)
+			if member is None :
+				continue
+			for user_role in member.roles :
+				user_role_id.append( user_role.id )
+
+		if user_role_id == [] or user_role_id is None :
+			return False
+
+		for roleitem in role_list :
+			if roleitem in user_role_id : 
+				return True
+		return False
+
+
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 
@@ -207,16 +246,86 @@ class DiscordCommand :
 
 
 	async def on_member_update(self, client: discord.Client, before: discord.Member, after: discord.Member):
+		async def run( key: str, client: discord.Client, before: discord.Member, after: discord.Member ):
+			try :
+				await self.C_list[key]["object"].on_member_update(config=self.C_list[key], client=client, before=before, after=after)
+
+			except AttributeError:
+				# イベント先がない場合は、スルーする。
+				pass
+
+		for key in self.C_list :
+			# 制限がないなら、そのまま実行する
+			if self.C_list[key].get("on_member_update") is None :
+				await run(key , client=client, before=before, after=after)
+				continue
+			roles = self.C_list[key]["on_member_update"].get("role")
+			if await self.roleCheck( role_list=roles , member=before) or await self.roleCheck( role_list=roles , member=after) :
+				await run(key , client=client, before=before, after=after)
+		
 		pass
 
 
 	async def on_member_remove(self, client: discord.Client, member: discord.Member ):
+		async def run( key: str, client: discord.Client, member: discord.Member ):
+			try :
+				await self.C_list[key]["object"].on_member_remove(config=self.C_list[key], client=client, member=member)
+
+			except AttributeError:
+				# イベント先がない場合は、スルーする。
+				pass
+
+		for key in self.C_list :
+			# 制限がないなら、そのまま実行する
+			if self.C_list[key].get("on_member_remove") is None :
+				await run(key , client=client, member=member)
+				continue
+			roles = self.C_list[key]["on_member_remove"].get("role")
+			#print("ok", roles)
+			if await self.roleCheck( role_list=roles , member=member) :
+				await run(key , client=client, member=member)
 		pass
 
 
 	async def on_user_update(self, client: discord.Client, before: discord.User, after: discord.User):
-		pass
+		async def run( key: str, client: discord.Client, before: discord.User, after: discord.User):
+			try :
+				await self.C_list[key]["object"].on_user_update(config=self.C_list[key], client=client, before=before, after=after)
 
+			except AttributeError:
+				# イベント先がない場合は、スルーする。
+				pass
+
+		for key in self.C_list :
+			# 制限がないなら、そのまま実行する
+			if self.C_list[key].get("on_user_update") is None :
+				await run(key , client=client, before=before, after=after)
+				continue
+			roles = self.C_list[key]["on_user_update"].get("role")
+			
+			if await self.roleCheck_user( client=client, role_list=roles , user=before ) or await self.roleCheck_user( client=client, role_list=roles , user=after ) :
+				await run(key , client=client, before=before, after=after)
+		pass
+	
+	async def on_member_join(self, client: discord.Client, member: discord.Member):
+		async def run( key: str, client: discord.Client, member: discord.Member ):
+			try :
+				await self.C_list[key]["object"].on_member_join(config=self.C_list[key], client=client, member=member)
+
+			except AttributeError:
+				# イベント先がない場合は、スルーする。
+				pass
+		for key in self.C_list :
+			# 制限がないなら、そのまま実行する
+			if self.C_list[key].get("on_member_join") is None :
+				await run(key , client=client, member=member)
+				continue
+			roles = self.C_list[key]["on_member_join"].get("role")
+			#print("ok", roles)
+			if await self.roleCheck( role_list=roles , member=member) :
+				print("IN")
+				await run(key , client=client, member=member)
+		pass
 
 	async def on_voice_state_update(self, client: discord.Client, member: discord.Member, before: discord.VoiceState , after: discord.VoiceState):
 		async def run( key: str, client: discord.Client , member: discord.Member, before: discord.VoiceState , after: discord.VoiceState):
