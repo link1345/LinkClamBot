@@ -96,16 +96,15 @@ class command(base.command_base)  :
 		pass
 
 
-	async def on_message(self, config, client: discord.Client, message: discord.Message) :
-		#await Sendtool.Send_Member(Data=message, message="interactive test message", filename=None)
-
+	async def interactive(self, client: discord.Client, message: discord.Message, member: discord.Member) :
+		# データ設定まで終われば、TURE
 		if self.talkNum == 0 :
-
+			print("talkNum 0")
 			self.talk = True
-			self.talk_UserID  = message.author.id
+			self.talk_UserID = member.id
 			self.talkNum = 1
 
-			text = "あなた(" + Sendtool.text_check(message.author.name) + "#" + Sendtool.text_check(message.author.discriminator) + ") さんの参加名簿情報を変更します。"
+			text = "" + Sendtool.text_check(member.name) + "#" + Sendtool.text_check(member.discriminator) + " さんの参加名簿情報を変更します。"
 			text += "\n下記の形式で、情報を書き込んでください。(※ 3分以内に返信がないと、受付を取りやめます。)"
 			#text += "\n```\nOriginID：\nVol内の呼び名：\nsteamユーザ名：\nUplay(Ubisoft)ユーザー名：\nBATTEL.NET[Battle Tag]：\nepicgamesディスプレイネーム：\nPlayStation ID：\nTwitterアカウント：\n```" )
 			
@@ -134,8 +133,10 @@ class command(base.command_base)  :
 				text += self.CSet_index_list[num].replace("\n","") + "：\n"
 			text += "```"
 
+			print("talkNum 0 send ")
 			await Sendtool.Send_Member(Data=message, message=text, filename=None)
 
+			print("talkNum 0 send 1")
 			async def stopwatch(self, client: discord.Client, message: discord.Message, task):
 				if task.current_loop == 1 :
 					self.talk = False
@@ -149,6 +150,8 @@ class command(base.command_base)  :
 				self.stopwatch_task.start(self, client, message, self.stopwatch_task)
 				pass
 
+			return False
+
 		elif self.talkNum == 1 :
 			# 時間内なら、ストップウォッチを止める。
 			if self.stopwatch_task.is_running() :
@@ -156,11 +159,19 @@ class command(base.command_base)  :
 				#print("  時間以内 -- ")
 
 			#print( self.talk_UserID ,"==", message.author.id )
-			if self.talk_UserID == message.author.id :
+			if self.talk_UserID == member.id :
 				#print("RUN! ")
-				await self.seting_message(message, message.author)
+				await self.seting_message(message, member)
 				self.talk = False
 				self.talkNum = 0
 				self.talk_UserID = 0
+				return True
 			else :
 				await Sendtool.Send_Member(Data=message, message="【名簿変更機能】他のユーザーの名簿を変更をしています。少々お待ちください。", filename=None)
+				return False
+
+
+	async def on_message(self, config, client: discord.Client, message: discord.Message) :
+		#await Sendtool.Send_Member(Data=message, message="interactive test message", filename=None)
+		await self.interactive(config, message, member=message.author)
+		pass

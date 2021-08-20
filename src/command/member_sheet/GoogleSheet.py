@@ -32,9 +32,27 @@ def getGooglesheet() :
  
 	return worksheet
 
+def getIndex_AllMember(worksheet: gspread.Spreadsheet, index_list, Flag_discord_Member):
+	# return は、 「行(member.idが当てはまる行)」 , 「列(col discordID部分)」 
+
+	row_index = worksheet.row_values(1)
+	#if not Check_ConfigList( row_index ) :
+	if set(row_index) != set(index_list) :
+		return None, None
+
+	# ID(列)を取得
+	col = worksheet.col_values(Flag_discord_Member["id"] + 1)
+	col.pop(0)
+
+	displayName_col = worksheet.col_values(Flag_discord_Member["display_name"] + 1)
+	displayName_col.pop(0)
+
+	return col , displayName_col
+
 def getIndex(worksheet: gspread.Spreadsheet, member, index_list, Flag_discord_Member):
 	# return は、 「行(member.idが当てはまる行)」 , 「列(col discordID部分)」 
 
+	#print("member + " , member.id)
 	row_index = worksheet.row_values(1)
 	#if not Check_ConfigList( row_index ) :
 	if set(row_index) != set(index_list) :

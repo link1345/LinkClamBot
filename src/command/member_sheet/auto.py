@@ -43,6 +43,11 @@ class command(base.command_base)  :
 			else :
 				data[item_num] = ""
 
+		if self.Flag_discord_Member["id"] is not None :
+			data[self.Flag_discord_Member["id"]] = str(member.id)
+			
+		if self.Flag_discord_Member["discriminator"] is not None :
+			data[self.Flag_discord_Member["discriminator"]] = member.discriminator
 
 		if self.Flag_discord_Member["name"] is not None :
 			data[self.Flag_discord_Member["name"]] = member.name
