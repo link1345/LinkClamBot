@@ -50,14 +50,14 @@ class ListMenu_SelectMenu(discord.ui.Select['ListMenu']):
 			defaultFlag = False
 			if num == 0 :
 				defaultFlag = True
-			print("add " , item )
+			#print("add " , item )
 			self.add_option(label=item, default=defaultFlag)
 			num += 1
 
 	async def callback(self, interaction: discord.Interaction):
 		#view: ListMenu = self.view
 		self.data.SelectPoint = self.text.index( self.values[-1] )
-		print("put")
+		#print("put")
 		pass
 
 class ListMenu(discord.ui.View):
@@ -84,6 +84,7 @@ class command(inter_user.command)  :
 
 		self.col = []
 		self.displayName_col = []
+		self.select_message = []
 	
 		self.client = None
 		self.message = None
@@ -98,7 +99,11 @@ class command(inter_user.command)  :
 			worksheet = CSheet.getGooglesheet()
 
 			self.col , self.displayName_col = CSheet.getIndex_AllMember(worksheet, self.CSet_index_list, self.Flag_discord_Member)
-			self.eventButton = ListMenu( self, self.displayName_col )
+
+			for num in range(len(self.displayName_col)) :
+				self.select_message.append(  self.displayName_col[num] + "  (" + client.get_user( int(self.col[num]) ).name + "#" + client.get_user( int(self.col[num]) ).discriminator + ")" )
+			#self.eventButton = ListMenu( self, self.displayName_col )
+			self.eventButton = ListMenu( self, self.select_message )
 			
 			#print("displayName_col " , self.displayName_col)
 			#print("col " , self.col)

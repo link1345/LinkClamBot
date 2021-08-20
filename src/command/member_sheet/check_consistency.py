@@ -23,11 +23,11 @@ class command(base.command_base)  :
 
 		pass
 
-	def changeData(self, old_data:list[str], member:discord.Member) :
+	def changeData(self, old_data:list[str], member:discord.Member, sheetIndexNumber) :
 		data = copy.deepcopy(old_data)
 
 		# Role
-		for item_num in self.Flag_discord_Member["role"] :
+		for item_num in sheetIndexNumber["role"] :
 			#print( "role test " ,  CSetting.SheetIndex[item_num] )
 			item = CSetting.SheetIndex[item_num]["discord.Member.role"]
 			Flag_role_hit = False
@@ -42,17 +42,17 @@ class command(base.command_base)  :
 			else :
 				data[item_num] = ""
 
-		if self.Flag_discord_Member["id"] is not None :
-			data[self.Flag_discord_Member["id"]] = str(member.id)
+		if sheetIndexNumber["id"] is not None :
+			data[sheetIndexNumber["id"]] = str(member.id)
 			
-		if self.Flag_discord_Member["discriminator"] is not None :
-			data[self.Flag_discord_Member["discriminator"]] = member.discriminator
+		if sheetIndexNumber["discriminator"] is not None :
+			data[sheetIndexNumber["discriminator"]] = member.discriminator
 
-		if self.Flag_discord_Member["name"] is not None :
-			data[self.Flag_discord_Member["name"]] = member.name
+		if sheetIndexNumber["name"] is not None :
+			data[sheetIndexNumber["name"]] = member.name
 
-		if self.Flag_discord_Member["display_name"] is not None :
-			data[self.Flag_discord_Member["display_name"]] = member.display_name
+		if sheetIndexNumber["display_name"] is not None :
+			data[sheetIndexNumber["display_name"]] = member.display_name
 		
 		return data
 
@@ -94,13 +94,13 @@ class command(base.command_base)  :
 			userList_id.append( str(user.id) )
 		
 		# 名簿取得
-		print(indexName)
-		print(sheetIndexNumber)
+		#print(indexName)
+		#print(sheetIndexNumber)
 		worksheet = CSheet.getGooglesheet()
 		sheet_col , sheet_displayName_col = CSheet.getIndex_AllMember(worksheet, indexName, sheetIndexNumber)
 
 		if sheet_col is None or sheet_displayName_col is None :
-			await Sendtool.Send_Member(Data=message, message="表壊れてる")
+			await Sendtool.Send_Member(Data=message, message="【ERROR】名簿の形式が壊れていませんか？")
 		
 		# 名簿に存在するか？
 		#print(sheet_col)
@@ -108,8 +108,13 @@ class command(base.command_base)  :
 		del_uesrs = list(set(sheet_col) - set(userList_id)) # sheetに過剰に存在する
 		add_users = list(set(userList_id) - set(sheet_col)) # sheetに存在しない
 
-		# 要らないデータ削除
+		#print("del_uesrs " , del_uesrs)
+		#print("add_users " , add_users )
+		
+		# 要らないデータ削除		
+		await Sendtool.Send_Member(Data=message, message="【報告】要らないデータを削除しています...")
 		for user in del_uesrs :
+			await Sendtool.Send_Member(Data=message, message="")
 			worksheet.delete_row( sheet_col.index(user) + 1 )
 			time.sleep(0.3)
 
@@ -117,33 +122,45 @@ class command(base.command_base)  :
 		worksheet = CSheet.getGooglesheet()
 		sheet_col , sheet_displayName_col = CSheet.getIndex_AllMember(worksheet, indexName, sheetIndexNumber)
 
+		#print("sheet_col " , sheet_col)
+		#print("sheet_displayName_col " , sheet_displayName_col )
+
 		if sheet_col is None or sheet_displayName_col is None :
-			await Sendtool.Send_Member(Data=message, message="表壊れてる")
+			await Sendtool.Send_Member(Data=message, message="【ERROR】名簿の形式が壊れていませんか？")
 
 		# 現在いるユーザー更新
+		await Sendtool.Send_Member(Data=message, message="【報告】欠損しているデータを埋めています...")
 		for num in range( len(sheet_col) ) :
-			old_user_row = worksheet.row_values( num + 1 ) 
-			#print( "old_user_row : ", old_user_row )
-			print( "member : " , userList[ userList_id.index( sheet_col[num] ) ] )
-			new_user_row = self.changeData(old_user_row,  userList[ userList_id.index( sheet_col[num] ) ] )
+			old_user_row = worksheet.row_values( num + 2 ) 
 
-			print(old_user_row)
-			print(new_user_row)
+			if len(indexName) - len(old_user_row) > 0 :
+				old_user_row += [""] * ( len(indexName) - len(old_user_row) )
+
+			#print( "old_user_row : ", old_user_row )
+			#print( "member : " , userList[ userList_id.index( sheet_col[num] ) ] )
+			change_after  = self.changeData(old_user_row,  userList[ userList_id.index( sheet_col[num] ) ] , sheetIndexNumber )
+
+			#print("change_after  " , change_after )
 
 			check_index_num = 0
 			for change_item in change_after :
 				if old_user_row[check_index_num] != change_item :			
-					print( "hit : ", old_user_row , " != " , change_item )
-					sheetData.update_cell( num + 1 , check_index_num , change_item)
+					#print( "hit : ", old_user_row[check_index_num] , " != " , change_item )
+					worksheet.update_cell( num + 2 , check_index_num + 1 , change_item)
 					time.sleep(0.3)
 				check_index_num += 1
 			
 		# 新しいデータ追加
+		await Sendtool.Send_Member(Data=message, message="【報告】名簿にないユーザーを追加しています...")
 		for user in add_users :
-			new_user_row = [""] * len(indexName)
-			print( "member : " , userList[ userList_id.index( sheet_col[num] ) ] )
-			new_user_row = self.changeData(new_user_row,  userList[ userList_id.index( sheet_col[num] ) ] )
-			worksheet.append_row( new_user_row )
+			change_after  = [""] * len(indexName)
+			#print( "member : " , userList[ userList_id.index( user ) ] )
+			change_after  = self.changeData(change_after ,  userList[ userList_id.index( user ) ] , sheetIndexNumber )
+			worksheet.append_row( change_after  )
+
+
+		await Sendtool.Send_Member(Data=message, message="**【終了】名簿の整合性チェックが終わりました。**")
+		await Sendtool.Send_Member(Data=message, message="【名簿URL】" + CSetting.SPREADSHEET_URL , filename=None)
 
 		pass
 
