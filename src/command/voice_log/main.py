@@ -164,7 +164,7 @@ class command(base.command_base)  :
 
 		# 動作時間決定
 		# ※ 指定日時に動作できないので、これで代用。
-		TestFlag = True # --- 定期実行のプログラムテスト以外では、これは、Falseにしてください --------------
+		TestFlag = False # --- 定期実行のプログラムテスト以外では、これは、Falseにしてください --------------
 		if TestFlag == False : # 1日に実行する
 			flag =  CTime.check('%d %H', '01 00')
 		else :                 # 1時に実行する
