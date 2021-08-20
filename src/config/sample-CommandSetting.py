@@ -73,7 +73,7 @@ CommandList["VOICE_LOG"] = {
 			"hours":0.0,
 			"minutes":10.0,
 			"seconds":0.0,
-			"message-channelID": [ channelID[ "正隊員対応" ] ],
+			"message-channelID": [ channelID[ "幹部対応" ] ],
 		}
 	}
 }
@@ -84,8 +84,8 @@ CommandList["INTERACITVE_VOICE_LOG"] = {
 		"CommandText": [
 			"、ログ取得したい",
 		],
-		"channelID": [ channelID[ "正隊員対応" ] ] ,
-		"role": [ roleID["正隊員"] ],
+		"channelID": [ channelID[ "幹部対応" ] ] ,
+		"role": [ roleID["幹部"] ],
 		"ExplanatoryText": "ヘルプ **テスト文**",
 	}
 }
@@ -155,8 +155,8 @@ CommandList["MEMBER_SHEET_INTERACITVE_ADMIN"] = {
 		"CommandText": [
 			"、上位権限で名簿情報を変更する",
 		],
-		"channelID": [ channelID[ "正隊員対応" ] ] ,
-		"role": [ roleID["正隊員"] ],
+		"channelID": [ channelID[ "幹部対応" ] ] ,
+		"role": [ roleID["幹部"] ],
 		"ExplanatoryText": "ヘルプ **テスト文**",
 	}
 }
@@ -167,8 +167,8 @@ CommandList["MEMBER_SHEET_CONSISTENCY_ADMIN"] = {
 		"CommandText": [
 			"、名簿整合性チェック",
 		],
-		"channelID": [ channelID[ "正隊員対応" ] ] ,
-		"role": [ roleID["正隊員"] ],
+		"channelID": [ channelID[ "幹部対応" ] ] ,
+		"role": [ roleID["幹部"] ],
 		"ExplanatoryText": "ヘルプ **テスト文**",
 	}
 }
