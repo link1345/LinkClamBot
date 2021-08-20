@@ -3,10 +3,12 @@
 import config.CommandSetting as base
 
 # シートのID
+# **** Configure to your environment. ****
 GOOGLE_SPREADSHEET_KEY=''
 SPREADSHEET_URL= "https://docs.google.com/spreadsheets/------"
 
 # シートの認証ファイル(json)
+# **** Configure to your environment. ****
 credentials_filepath="./command/member_sheet/aaaaaaaaaaaaaaaaaaa.json"
 
 

@@ -1,6 +1,7 @@
 
 ## -----------------
 # ID setting
+# **** Configure to your environment. ****
 
 channelID = {
 	"正隊員対応" : 0 ,
