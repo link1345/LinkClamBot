@@ -33,10 +33,11 @@ def getGooglesheet() :
 	return worksheet
 
 def getIndex_AllMember(worksheet: gspread.Spreadsheet, index_list, Flag_discord_Member):
-	# return は、 「行(member.idが当てはまる行)」 , 「列(col discordID部分)」 
-
+	
 	row_index = worksheet.row_values(1)
 	#if not Check_ConfigList( row_index ) :
+	#print(row_index)
+	#print(index_list)
 	if set(row_index) != set(index_list) :
 		return None, None
 

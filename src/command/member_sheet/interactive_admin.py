@@ -100,14 +100,14 @@ class command(inter_user.command)  :
 			self.col , self.displayName_col = CSheet.getIndex_AllMember(worksheet, self.CSet_index_list, self.Flag_discord_Member)
 			self.eventButton = ListMenu( self, self.displayName_col )
 			
-			print("displayName_col " , self.displayName_col)
-			print("col " , self.col)
+			#print("displayName_col " , self.displayName_col)
+			#print("col " , self.col)
 
 			await Sendtool.Send_Member(Data=message, message="誰の名簿情報を変更しますか？", view=self.eventButton)
 		
 		# "決定ボタンを押した後"
 		elif self.talkNum_admin == 1 :
-			print("admin!")
+			#print("admin!")
 			if await self.interactive(self.client, message=message, member=self.SelectUser) :
 				self.talkNum_admin = 0				
 			#await Sendtool.Send_Member(Data=message, message="interactive test message", filename=None)

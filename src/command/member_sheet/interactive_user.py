@@ -76,7 +76,7 @@ class command(base.command_base)  :
 			if hitflag :
 				continue
 		
-			print(change_after[num] +" = "+ textbox[textbox_num])
+			#print(change_after[num] +" = "+ textbox[textbox_num])
 
 			# 手動記入欄
 			textItem = textbox[textbox_num].split("：")
@@ -99,7 +99,7 @@ class command(base.command_base)  :
 	async def interactive(self, client: discord.Client, message: discord.Message, member: discord.Member) :
 		# データ設定まで終われば、TURE
 		if self.talkNum == 0 :
-			print("talkNum 0")
+			#print("talkNum 0")
 			self.talk = True
 			self.talk_UserID = member.id
 			self.talkNum = 1
@@ -133,10 +133,8 @@ class command(base.command_base)  :
 				text += self.CSet_index_list[num].replace("\n","") + "：\n"
 			text += "```"
 
-			print("talkNum 0 send ")
 			await Sendtool.Send_Member(Data=message, message=text, filename=None)
 
-			print("talkNum 0 send 1")
 			async def stopwatch(self, client: discord.Client, message: discord.Message, task):
 				if task.current_loop == 1 :
 					self.talk = False
