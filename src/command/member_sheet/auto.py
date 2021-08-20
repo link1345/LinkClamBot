@@ -48,12 +48,6 @@ class command(base.command_base)  :
 				self.Flag_discord_Member_discriminator = num
 
 		self.CSet_index_list = s_index_list
-		print(self.CSet_index_list)
-		print( self.Flag_discord_Member_role )
-		print( self.Flag_discord_Member_id )
-		print( self.Flag_discord_Member_display_name )
-		print( self.Flag_discord_Member_name )
-		print( self.Flag_discord_Member_discriminator )
 		pass
 
 
@@ -80,6 +74,7 @@ class command(base.command_base)  :
 			row = worksheet.row_values(member_point)
 		
 		return row, col , member_point
+
 
 	def changeData(self, old_data:list[str], member:discord.Member) :
 		data = copy.deepcopy(old_data)
@@ -109,6 +104,7 @@ class command(base.command_base)  :
 		
 		return data
 
+
 	def changeData_User(self, old_data:list[str], member:discord.User) :
 		data = copy.deepcopy(old_data)
 
@@ -126,6 +122,7 @@ class command(base.command_base)  :
 			data[self.Flag_discord_Member_display_name] = member.display_name
 
 		return data
+
 
 	async def changeOneData(self, channelID:int, client:discord.Client, before, after, row:list[str], sheetData, member_point=2) :
 
@@ -150,7 +147,7 @@ class command(base.command_base)  :
 			# このデータが変更されているか？
 			#print(row[num] + " != " +change_item )
 			if row[num] != change_item :
-				print(row[num] + " != " +change_item )
+				#print(row[num] + " != " +change_item )
 				# sheet変更
 				sheetData.update_cell(member_point, num + 1, change_item)
 
@@ -190,8 +187,8 @@ class command(base.command_base)  :
 	async def changeOneData_User(self, channelID:int, client:discord.Client, before, after, row:list[str], sheetData, member_point=2) :
 
 		change_after = self.changeData_User(row, after)
-		print("row " , row)
-		print("change_after " , change_after)
+		#print("row " , row)
+		#print("change_after " , change_after)
 
 		# ロールが全て無くなり名簿から削除する
 		num = 0
@@ -199,7 +196,7 @@ class command(base.command_base)  :
 			# このデータが変更されているか？
 			#print(row[num] + " != " +change_item )
 			if row[num] != change_item :
-				print(row[num] + " != " +change_item )
+				#print(row[num] + " != " +change_item )
 				# sheet変更
 				sheetData.update_cell(member_point, num + 1, change_item)
 
@@ -209,11 +206,7 @@ class command(base.command_base)  :
 					text = "**【自動報告】**" + after.display_name + "さんのIDが変更されました。"
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 
-				#
-				if self.Flag_discord_Member_display_name is not None and self.Flag_discord_Member_display_name == num :
-					text = "**【自動報告】**" + before.display_name + "さんのニックネームが、**"+ after.display_name +"**に変わりました。"					
-					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
-				
+				# name
 				if self.Flag_discord_Member_name is not None and self.Flag_discord_Member_name == num:
 					text = "**【自動報告】**" + before.display_name + "(" + before.name +")さんのシステム名前が、" + after.name + "に変更されました"					
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
@@ -228,8 +221,8 @@ class command(base.command_base)  :
 
 
 	async def on_message(self, config, client: discord.Client, message: discord.Message) :
-		await Sendtool.Send_Member(Data=message, message="auto test message", filename=None)
-
+		#await Sendtool.Send_Member(Data=message, message="auto test message", filename=None)
+		pass
 	
 	async def on_member_update(self, config, client: discord.Client, before: discord.Member, after: discord.Member) :
 
@@ -243,7 +236,7 @@ class command(base.command_base)  :
 
 		def makelist_roleID(member: discord.Member ):
 			ID = []
-			print(member.roles)
+			#print(member.roles)
 			for role in member.roles :
 				ID.append( role.id )
 			return ID
@@ -254,8 +247,8 @@ class command(base.command_base)  :
 		if set(before_roleID) != set(after_roleID) : 
 			addItem =  list( set(after_roleID) - set(before_roleID) )
 			deleteItem =  list( set(before_roleID) - set(after_roleID) )
-			print("delete : " , deleteItem)
-			print("add : " , addItem)
+			#print("delete : " , deleteItem)
+			#print("add : " , addItem)
 			changeFlag = True
 
 		if changeFlag :
@@ -266,9 +259,9 @@ class command(base.command_base)  :
 			col = []
 			member_point = None
 			row, col, member_point = self.getIndex(sheetData, before)
-			print("row : " , row)
-			print("col : " , col)
-			print(" member_point : " , member_point)
+			#print("row : " , row)
+			#print("col : " , col)
+			#print(" member_point : " , member_point)
 
 			if row is None and col is None :
 				# 名簿がおかしい				
@@ -278,18 +271,18 @@ class command(base.command_base)  :
 
 			if member_point is None or row is None or row == [] :
 				# 名簿に存在しないので、新規登録
-				print("user Add")
+				#print("user Add")
 				row = [""] * len(self.CSet_index_list)
 				row = self.changeData(row, after)
-				print("user Add ROW : " , row)
+				#print("user Add ROW : " , row)
 				sheetData.append_row(row)
-				print("user Add OK")
+				#print("user Add OK")
 				return 
 			
 			# ただの変更の場合。
 			## 変更があったところだけ更新して終わり。
 			await self.changeOneData(channelID=CSetting.AutoEvent_ERRORMessage_channelID, client=client, before=before, after=after, row=row,  sheetData=sheetData, member_point=member_point)
-			print("user changeOneData OK")
+			#print("user changeOneData OK")
 
 		pass
 
@@ -307,19 +300,20 @@ class command(base.command_base)  :
 
 		pass
 
-	async def on_user_update( self, config, client: discord.Client, before: discord.User, after: discord.User ) :
-		print("test user update")
 
+	async def on_user_update( self, config, client: discord.Client, before: discord.User, after: discord.User ) :
+		#print("test user update")
 
 		sheetData = CSheet.getGooglesheet()
 		row, col, member_point = self.getIndex(sheetData, before)
-		print("row : " , row)
-		print("col : " , col)
-		print(" member_point : " , member_point)
-
+		#print("row : " , row)
+		#print("col : " , col)
+		#print(" member_point : " , member_point)
+		
 		await self.changeOneData_User(channelID=CSetting.AutoEvent_ERRORMessage_channelID, client=client, before=before, after=after, row=row, sheetData=sheetData, member_point=member_point)
 
 		pass
+
 
 	async def on_member_join( self, config, client: discord.Client, member: discord.Member ) :
 		#print("test member join")

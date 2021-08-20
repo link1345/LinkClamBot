@@ -323,7 +323,7 @@ class DiscordCommand :
 			roles = self.C_list[key]["on_member_join"].get("role")
 			#print("ok", roles)
 			if await self.roleCheck( role_list=roles , member=member) :
-				print("IN")
+				#print("IN")
 				await run(key , client=client, member=member)
 		pass
 

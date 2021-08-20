@@ -13,7 +13,7 @@ def getGooglesheet() :
 	if not os.path.exists(CSetting.credentials_filepath):
 		return None
 
-	print("sheet load start")
+	#print("sheet load start")
  
 	#2つのAPIを記述しないとリフレッシュトークンを3600秒毎に発行し続けなければならない
 	scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -28,15 +28,6 @@ def getGooglesheet() :
 	#共有設定したスプレッドシートのシート1を開く
 	worksheet = gc.open_by_key( CSetting.GOOGLE_SPREADSHEET_KEY ).sheet1
  
-	print("sheet load OK!")
+	#print("sheet load OK!")
  
 	return worksheet
-
-def NoneCheck(worksheet: gspread.Spreadsheet) :
-	#dataframe = pd.DataFrame(worksheet.get_all_records())
-	#print( "dataframe test " , dataframe )
-
-	val = worksheet.cell(1, 1).value
-	print( "val " , val )
-
-	# 
