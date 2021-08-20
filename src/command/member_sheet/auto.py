@@ -20,67 +20,15 @@ class command(base.command_base)  :
 	def __init__(self) :
 		super().__init__()
 
-		self.Flag_discord_Member_role = [] # list[]
-		self.Flag_discord_Member_id = None
-		self.Flag_discord_Member_display_name = None
-		self.Flag_discord_Member_name = None
-		self.Flag_discord_Member_discriminator = None
-
-		s_index_list = []
-		for s_index in CSetting.SheetIndex :
-			num = CSetting.SheetIndex.index(s_index) 
-			if "text" in s_index.keys() :
-				s_index_list.append( s_index["text"]["label"] )
-			if "discord.Member.role" in s_index.keys() :
-				s_index_list.append( s_index["discord.Member.role"]["name"] )
-				self.Flag_discord_Member_role.append( num )
-			if "discord.Member.id" in s_index.keys() :
-				s_index_list.append( s_index["discord.Member.id"] )
-				self.Flag_discord_Member_id = num
-			if "discord.Member.display_name" in s_index.keys() :
-				s_index_list.append( s_index["discord.Member.display_name"] )
-				self.Flag_discord_Member_display_name = num
-			if "discord.Member.name" in s_index.keys() :
-				s_index_list.append( s_index["discord.Member.name"] )
-				self.Flag_discord_Member_name = num
-			if "discord.Member.discriminator" in s_index.keys() :
-				s_index_list.append( s_index["discord.Member.discriminator"] )
-				self.Flag_discord_Member_discriminator = num
-
-		self.CSet_index_list = s_index_list
+		self.Flag_discord_Member, self.CSet_index_list = CSheet.SettingIndex()
 		pass
-
-
-	def getIndex(self, worksheet: gspread.Spreadsheet, member):
-		# return は、 「行(member.idが当てはまる行)」 , 「列(col discordID部分)」 
-
-		row_index = worksheet.row_values(1)
-		#if not Check_ConfigList( row_index ) :
-		if set(row_index) != set(self.CSet_index_list) :
-			return None, None
-
-		# ID(列)を取得
-		col = worksheet.col_values(self.Flag_discord_Member_id + 1)
-
-		member_point = None
-		if str(member.id) in col:
-			try :
-				member_point = col.index(str(member.id)) + 1
-			except IndexError:
-				print("名簿にいません")
-
-		row = None
-		if member_point is not None :
-			row = worksheet.row_values(member_point)
-		
-		return row, col , member_point
 
 
 	def changeData(self, old_data:list[str], member:discord.Member) :
 		data = copy.deepcopy(old_data)
 
 		# Role
-		for item_num in self.Flag_discord_Member_role :
+		for item_num in self.Flag_discord_Member["role"] :
 			#print( "role test " ,  CSetting.SheetIndex[item_num] )
 			item = CSetting.SheetIndex[item_num]["discord.Member.role"]
 			Flag_role_hit = False
@@ -96,11 +44,11 @@ class command(base.command_base)  :
 				data[item_num] = ""
 
 
-		if self.Flag_discord_Member_name is not None :
-			data[self.Flag_discord_Member_name] = member.name
+		if self.Flag_discord_Member["name"] is not None :
+			data[self.Flag_discord_Member["name"]] = member.name
 
-		if self.Flag_discord_Member_display_name is not None :
-			data[self.Flag_discord_Member_display_name] = member.display_name
+		if self.Flag_discord_Member["display_name"] is not None :
+			data[self.Flag_discord_Member["display_name"]] = member.display_name
 		
 		return data
 
@@ -109,17 +57,17 @@ class command(base.command_base)  :
 		data = copy.deepcopy(old_data)
 
 		# ID
-		if self.Flag_discord_Member_id is not None :
-			data[self.Flag_discord_Member_id] = str(member.id)
+		if self.Flag_discord_Member["id"] is not None :
+			data[self.Flag_discord_Member["id"]] = str(member.id)
 		
-		if self.Flag_discord_Member_discriminator is not None :
-			data[self.Flag_discord_Member_discriminator] = member.discriminator
+		if self.Flag_discord_Member["discriminator"] is not None :
+			data[self.Flag_discord_Member["discriminator"]] = member.discriminator
 		
-		if self.Flag_discord_Member_name is not None :
-			data[self.Flag_discord_Member_name] = member.name
+		if self.Flag_discord_Member["name"] is not None :
+			data[self.Flag_discord_Member["name"]] = member.name
 		
-		if self.Flag_discord_Member_display_name is not None :
-			data[self.Flag_discord_Member_display_name] = member.display_name
+		if self.Flag_discord_Member["display_name"] is not None :
+			data[self.Flag_discord_Member["display_name"]] = member.display_name
 
 		return data
 
@@ -131,8 +79,8 @@ class command(base.command_base)  :
 		#print("change_after " , change_after)
 
 		# ロールが全て無くなり名簿から削除する
-		flagrole = len(self.Flag_discord_Member_role)
-		for item_num in self.Flag_discord_Member_role :
+		flagrole = len(self.Flag_discord_Member["role"])
+		for item_num in self.Flag_discord_Member["role"] :
 			if change_after[item_num] == "":
 				flagrole -= 1
 				
@@ -153,30 +101,30 @@ class command(base.command_base)  :
 
 				# --- 以下、メッセージ文
 				# ロール
-				for item_num in self.Flag_discord_Member_role :
+				for item_num in self.Flag_discord_Member["role"] :
 					if num == item_num :
-						text="**【自動報告】**" + after.display_name + "さんの、役職が変更されました"
+						text="**【自動報告】**" + Sendtool.text_check(after.display_name) + "さんの、役職が変更されました"
 						if row[num] == "〇" :
-							text = "**【自動報告】**" + after.display_name + "さんは、" + CSetting.SheetIndex[item_num]["discord.Member.role"]["name"] + "が剥奪されました"				
+							text = "**【自動報告】**" + Sendtool.text_check(after.display_name) + "さんは、" + Sendtool.text_check(CSetting.SheetIndex[item_num]["discord.Member.role"]["name"]) + "が剥奪されました"				
 						else :
-							text = "**【自動報告】**" + after.display_name + "さんは、" + CSetting.SheetIndex[item_num]["discord.Member.role"]["name"] + "を付与されました"
+							text = "**【自動報告】**" + Sendtool.text_check(after.display_name) + "さんは、" + Sendtool.text_check(CSetting.SheetIndex[item_num]["discord.Member.role"]["name"]) + "を付与されました"
 						await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 
 				# ID
-				if self.Flag_discord_Member_id is not None and self.Flag_discord_Member_id == num :
-					text = "**【自動報告】**" + after.display_name + "さんのIDが変更されました。"
+				if self.Flag_discord_Member["id"] is not None and self.Flag_discord_Member["id"] == num :
+					text = "**【自動報告】**" + Sendtool.text_check(after.display_name) + "さんのIDが変更されました。"
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 
 				#
-				if self.Flag_discord_Member_display_name is not None and self.Flag_discord_Member_display_name == num :
-					text = "**【自動報告】**" + before.display_name + "さんのニックネームが、**"+ after.display_name +"**に変わりました。"					
+				if self.Flag_discord_Member["display_name"] is not None and self.Flag_discord_Member["display_name"] == num :
+					text = "**【自動報告】**" + Sendtool.text_check(before.display_name) + "さんのニックネームが、**"+ Sendtool.text_check(after.display_name) +"**に変わりました。"					
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 				
-				if self.Flag_discord_Member_name is not None and self.Flag_discord_Member_name == num:
-					text = "**【自動報告】**" + before.display_name + "(" + before.name +")さんのシステム名前が、" + after.name + "に変更されました"					
+				if self.Flag_discord_Member["name"] is not None and self.Flag_discord_Member["name"] == num:
+					text = "**【自動報告】**" + Sendtool.text_check(before.display_name) + "(" + Sendtool.text_check(before.name) +")さんのシステム名前が、" + Sendtool.text_check(after.name) + "に変更されました"					
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 				
-				if self.Flag_discord_Member_discriminator is not None and self.Flag_discord_Member_discriminator == num:
+				if self.Flag_discord_Member["discriminator"] is not None and self.Flag_discord_Member["discriminator"] == num:
 					# discriminator は…メッセージ要らんでしょ。
 					pass
 
@@ -202,16 +150,16 @@ class command(base.command_base)  :
 
 				# --- 以下、メッセージ文
 				# ID
-				if self.Flag_discord_Member_id is not None and self.Flag_discord_Member_id == num :
-					text = "**【自動報告】**" + after.display_name + "さんのIDが変更されました。"
+				if self.Flag_discord_Member["id"] is not None and self.Flag_discord_Member["id"] == num :
+					text = "**【自動報告】**" + Sendtool.text_check(after.display_name) + "さんのIDが変更されました。"
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 
 				# name
-				if self.Flag_discord_Member_name is not None and self.Flag_discord_Member_name == num:
-					text = "**【自動報告】**" + before.display_name + "(" + before.name +")さんのシステム名前が、" + after.name + "に変更されました"					
+				if self.Flag_discord_Member["name"] is not None and self.Flag_discord_Member["name"] == num:
+					text = "**【自動報告】**" + Sendtool.text_check(before.display_name) + "(" + Sendtool.text_check(before.name) +")さんのシステム名前が、" + Sendtool.text_check(after.name) + "に変更されました"					
 					await Sendtool.Send_ChannelID(client=client, channelID=channelID, message=text, filename=None)
 				
-				if self.Flag_discord_Member_discriminator is not None and self.Flag_discord_Member_discriminator == num:
+				if self.Flag_discord_Member["discriminator"] is not None and self.Flag_discord_Member["discriminator"] == num:
 					# discriminator は…メッセージ要らんでしょ。
 					pass
 
@@ -258,7 +206,7 @@ class command(base.command_base)  :
 			row = []
 			col = []
 			member_point = None
-			row, col, member_point = self.getIndex(sheetData, before)
+			row, col, member_point = CSheet.getIndex(sheetData, before, self.CSet_index_list, self.Flag_discord_Member)
 			#print("row : " , row)
 			#print("col : " , col)
 			#print(" member_point : " , member_point)
@@ -291,11 +239,11 @@ class command(base.command_base)  :
 		sheetData = CSheet.getGooglesheet()
 		if sheetData is None :
 			return
-		row, col, member_point = self.getIndex(sheetData, member)
+		row, col, member_point = CSheet.getIndex(sheetData, member, self.CSet_index_list, self.Flag_discord_Member)
 
 		if member_point is not None :
 			sheetData.delete_row(member_point)
-			text="**【自動報告】**" + member.display_name + "さんは、脱退しました"
+			text="**【自動報告】**" + Sendtool.text_check(member.display_name) + "さんは、脱退しました"
 			await Sendtool.Send_ChannelID(client=client, channelID=CSetting.AutoEvent_ERRORMessage_channelID, message=text, filename=None)
 
 		pass
@@ -305,7 +253,7 @@ class command(base.command_base)  :
 		#print("test user update")
 
 		sheetData = CSheet.getGooglesheet()
-		row, col, member_point = self.getIndex(sheetData, before)
+		row, col, member_point = CSheet.getIndex(sheetData, before, self.CSet_index_list, self.Flag_discord_Member)
 		#print("row : " , row)
 		#print("col : " , col)
 		#print(" member_point : " , member_point)

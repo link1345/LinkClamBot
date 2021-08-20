@@ -166,17 +166,16 @@ class DiscordCommand :
 				#print("BOT!")
 				continue
 
-			if self.C_list[key]["object"].talk is True :
-				await run(key, client, message)
-				continue
-
 			# 以降[Bot判定あり]
 
 			run_Flag = [] # Max=3
-
+			
 			# 命令チェック
 			c_text = self.C_list[key]["onMessage"].get("CommandText")
-			if c_text is None :
+
+			if self.C_list[key]["object"].talk is True :
+				run_Flag.append("Text")
+			elif c_text is None :
 				run_Flag.append("Text")
 			else :				
 				for item_text in c_text :

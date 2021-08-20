@@ -13,6 +13,7 @@ class command(base.command_base)  :
 	def __init__(self) :
 		super().__init__()
 		#self.test_task: tasks.Loop = None
+		pass
 
 	async def on_message(self, config, client: discord.Client, message: discord.Message) :
 		
