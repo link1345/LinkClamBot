@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  bot:
+    build: ./src
+    container_name: Docker_LinkClanBot
+    volumes:
+      - ./src:/root/opt
+    environment:
+      - TZ=Asia/Tokyo
+#     - DEBUG=app:*
+    working_dir: /root
+    restart: always
+    tty: true
