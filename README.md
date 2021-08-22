@@ -3,8 +3,8 @@ A DiscordBot for managing a game's clans, with features such as recording partic
 
 Features include :
 
-	VoiceChennel Monitoring
-	MemberList (GoogleSheet)
+* VoiceChennel Monitoring
+* MemberList (GoogleSheet)
 
 
 # Download 
