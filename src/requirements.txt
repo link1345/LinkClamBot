@@ -1,4 +1,4 @@
-git+https://github.com/Rapptz/discord.py
+git+https://github.com/Rapptz/discord.py@0df3f51a0b87111cd5d7ff2d0f65df5bd9a5e207
 datetime
 python-dateutil
 pandas

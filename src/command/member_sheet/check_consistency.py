@@ -114,9 +114,8 @@ class command(base.command_base)  :
 		# 要らないデータ削除		
 		await Sendtool.Send_Member(Data=message, message="【報告】要らないデータを削除しています...")
 		for user in del_uesrs :
-			await Sendtool.Send_Member(Data=message, message="")
-			worksheet.delete_row( sheet_col.index(user) + 1 )
-			time.sleep(0.3)
+			worksheet.delete_row( sheet_col.index(user) + 2 )
+			time.sleep(1)
 
 		# 再度データ撮り直し。
 		worksheet = CSheet.getGooglesheet()
@@ -147,7 +146,7 @@ class command(base.command_base)  :
 				if old_user_row[check_index_num] != change_item :			
 					#print( "hit : ", old_user_row[check_index_num] , " != " , change_item )
 					worksheet.update_cell( num + 2 , check_index_num + 1 , change_item)
-					time.sleep(0.3)
+					time.sleep(1)
 				check_index_num += 1
 			
 		# 新しいデータ追加
