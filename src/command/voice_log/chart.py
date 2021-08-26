@@ -149,6 +149,9 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 		except ValueError as error :
 			# 現在の鯖に、存在しない人は処理しない。
 			continue
+		except KeyError as error :
+			# member.idが存在しない場合(何らかしらの関係でログがない場合)
+			continue
 
 		if item["Flag"] == "entry" :
 			 df_dict["start"][indexNum] = item["time"]
