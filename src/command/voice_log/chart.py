@@ -2,7 +2,7 @@ import discord
 import os
 import json
 
-import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from pprint import pprint
@@ -17,9 +17,9 @@ def most_old_Month() :
 	labels = []
 	fileNameList = []
 	while True :
-		filetime = datetime.datetime.today() - relativedelta(months=old_month)
-		m_month = datetime.datetime.strftime(filetime,'%m')
-		m_year = datetime.datetime.strftime(filetime,'%Y')
+		filetime = datetime.today() - relativedelta(months=old_month)
+		m_month = datetime.strftime(filetime,'%m')
+		m_year = datetime.strftime(filetime,'%Y')
 		filename = CSetting.baseLogFolder + CSetting.JSONPATH_row + m_year + m_month + ".json"
 		if not os.path.exists( filename ) :
 			old_month -= 1 # 調査用に+1してあるので、実際の値は、これにold_monthに-1したものとなる。
@@ -163,8 +163,8 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 			df_dict["exit"][indexNum] = item["time"]
 
 			# 差分計算
-			a_time = datetime.datetime.strptime( df_dict["start"][indexNum] , '%Y/%m/%d %H:%M:%S')
-			b_time = datetime.datetime.strptime( df_dict["exit"][indexNum] , '%Y/%m/%d %H:%M:%S')
+			a_time = datetime.strptime( df_dict["start"][indexNum] , '%Y/%m/%d %H:%M:%S')
+			b_time = datetime.strptime( df_dict["exit"][indexNum] , '%Y/%m/%d %H:%M:%S')
 
 
 			time : float = (b_time - a_time).total_seconds()
