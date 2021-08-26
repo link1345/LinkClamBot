@@ -29,7 +29,7 @@ class push_Button(discord.ui.Button['ListMenu']):
 			await interaction.message.delete()
 
 			# 聞いて置く。(この後、対話があるが、ここではやっていない。)
-			print( "point" , self.data.SelectPoint , "   num:", self.data.SelectPoint + ( 25 * self.data.SelectListPoint ) )
+			#print( "point" , self.data.SelectPoint , "   num:", self.data.SelectPoint + ( 25 * self.data.SelectListPoint ) )
 
 			userID = self.data.col[ self.data.SelectPoint ]
 			self.data.SelectUser = self.data.client.get_user( int(userID) )
@@ -54,9 +54,9 @@ class ListMenu_SelectMenu(discord.ui.Select['ListMenu']):
 			else :
 				stop_num = ( len(self.text) ) % 25 + ( 25 * self.data.SelectListPoint )
 
-			print( "start:" , start_num , "   stop:" , stop_num )
+			#print( "start:" , start_num , "   stop:" , stop_num )
 			for item_num in range( start_num , stop_num) :
-				print("num : " , item_num)
+				#print("num : " , item_num)
 				defaultFlag = False
 				if item_num == start_num :
 					defaultFlag = True
