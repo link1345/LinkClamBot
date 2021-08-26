@@ -158,7 +158,7 @@ class test_button_Button(discord.ui.Button['test_button']):
 
 			# 計算済みファイル	
 			now_filepath = CSetting.baseLogFolder + CSetting.JSONPATH_row + CSetting.JSONPATH_now
-			timeData = await Chart.makeTimeList(self.client, now_filepath , CSetting.OneMonthOutput_RoleID , mode="NAME")
+			timeData = await Chart.makeTimeList(self.client, now_filepath , CSetting.OneMonthOutput_RoleID )
 			if timeData is not None :
 				send_fileName = CSetting.baseLogFolder + CSetting.JSONPATH_analysis + CSetting.JSONPATH_now_csv
 				timeData.to_csv( send_fileName )
