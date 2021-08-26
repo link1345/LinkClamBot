@@ -158,9 +158,12 @@ async def makeTimeList( client: discord.Client, Datafile_path: str , RoleList: l
 		if item["Flag"] == "exit" :
 			# スタートがないのに、エンドがある場合
 			if df_dict["start"][indexNum] is None :
-				# とりあえず、月初めに入室した扱いにする(他の方法も検討中。そもそも入室してない扱いetc..)
-				tmp_startTime = datetime.now().strftime("%Y/%m/01 00:00:00")
-				df_dict["start"][indexNum] = tmp_startTime
+				### (取り消し) とりあえず、月初めに入室した扱いにする(他の方法も検討中。そもそも入室してない扱いetc..)
+				###tmp_startTime = datetime.now().strftime("%Y/%m/01 00:00:00")
+				###df_dict["start"][indexNum] = tmp_startTime
+				
+				# そもそも入室してない扱いにする
+				continue
 
 			# --
 			df_dict["exit"][indexNum] = item["time"]
