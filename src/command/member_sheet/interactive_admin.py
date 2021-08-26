@@ -50,7 +50,7 @@ class ListMenu_SelectMenu(discord.ui.Select['ListMenu']):
 			start_num = 25 * self.data.SelectListPoint
 			stop_num = 0
 			if ( len(self.text) / 25 - self.data.SelectListPoint ) > 1.0 :
-				stop_num = 25 * self.data.SelectListPoint + 1
+				stop_num = 25 * self.data.SelectListPoint + 25
 			else :
 				stop_num = ( len(self.text) ) % 25 + ( 25 * self.data.SelectListPoint )
 
@@ -86,7 +86,7 @@ class ListMenu_SelectMenu(discord.ui.Select['ListMenu']):
 					continue
 				if child.custom_id != self.custom_id :
 					view.remove_item(child)
-					view.add_item( ListMenu_SelectMenu(data, self.data.select_message) )
+					view.add_item( ListMenu_SelectMenu(self.data, self.data.select_message) )
 			
 			await interaction.message.edit(view=view)
 
