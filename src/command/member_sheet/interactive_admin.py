@@ -31,7 +31,7 @@ class push_Button(discord.ui.Button['ListMenu']):
 			# 聞いて置く。(この後、対話があるが、ここではやっていない。)
 			print( "point" , self.data.SelectPoint , "   num:", self.data.SelectPoint + ( 25 * self.data.SelectListPoint ) )
 
-			userID = self.data.col[self.data.SelectPoint + ( 25 * self.data.SelectListPoint ) ]
+			userID = self.data.col[ self.data.SelectPoint ]
 			self.data.SelectUser = self.data.client.get_user( int(userID) )
 			await self.data.interactive(self.data.client, message=self.data.message, member=self.data.SelectUser)
 		return
