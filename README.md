@@ -2,6 +2,8 @@
 
 **Due to the discontinuation of discord.py development, we will stop updating this bot.**
 
+Discord.pyの開発中止に伴い、このボットの更新を中止します。
+
 # LinkClamBot
 
 ~~A DiscordBot for managing a game's clans, with features such as recording participation time in voice channels, voting, and teaming.~~
