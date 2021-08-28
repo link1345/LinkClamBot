@@ -1,5 +1,10 @@
+# ReadMe!
+
+**Due to the discontinuation of discord.py development, we will stop updating this bot.**
+
 # LinkClamBot
-A DiscordBot for managing a game's clans, with features such as recording participation time in voice channels, voting, and teaming.
+
+~~A DiscordBot for managing a game's clans, with features such as recording participation time in voice channels, voting, and teaming.~~
 
 Features include :
 
